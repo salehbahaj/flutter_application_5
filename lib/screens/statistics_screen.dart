@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../data/dummy_data.dart';
 import '../utils/constants.dart';
 
 class StatisticsScreen extends StatelessWidget {
@@ -6,10 +7,12 @@ class StatisticsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const int totalTasks = 5;
-    const int completedTasks = 2;
-    const int pendingTasks = 3;
-    const double completionRate = 40.0;
+    final totalTasks = dummyTasks.length;
+    final completedTasks = dummyTasks.where((t) => t.isCompleted).length;
+    final pendingTasks = totalTasks - completedTasks;
+    final completionRate = totalTasks == 0
+        ? 0.0
+        : (completedTasks / totalTasks) * 100;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -18,8 +21,7 @@ class StatisticsScreen extends StatelessWidget {
         backgroundColor: primaryColor,
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        // ✅ هذا هو الحل: جعل المحتوى قابلًا للتمرير
+      body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
@@ -88,11 +90,12 @@ class StatisticsScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    _buildSubjectStatRow('الرياضيات', 2),
-                    _buildSubjectStatRow('العلوم', 1),
-                    _buildSubjectStatRow('اللغة العربية', 1),
-                    _buildSubjectStatRow('اللغة الإنجليزية', 1),
-                    _buildSubjectStatRow('التاريخ', 0),
+                    ...subjects.map((subject) {
+                      final count = dummyTasks
+                          .where((t) => t.subject == subject.name)
+                          .length;
+                      return _buildSubjectStatRow(subject.name, count);
+                    }),
                   ],
                 ),
               ),

@@ -1,4 +1,15 @@
-// نموذج المادة – سيتم إكماله لاحقاً
+import 'package:flutter/material.dart';
+
 class Subject {
-  // placeholder
+  final String id;
+  final String name;
+  final IconData icon;
+  final Color color;
+
+  Subject({
+    required this.id,
+    required this.name,
+    required this.icon,
+    required this.color,
+  });
 }

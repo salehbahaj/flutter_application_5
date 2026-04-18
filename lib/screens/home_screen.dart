@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
+import '../data/dummy_data.dart';
 import '../utils/constants.dart';
+import '../models/subject_model.dart';
 import 'tasks_screen.dart';
+import 'add_subject_screen.dart';
 
-// بيانات مؤقتة للأسبوع الثاني (سيتم استبدالها لاحقاً)
-final List<Map<String, dynamic>> tempSubjects = [
-  {'name': 'الرياضيات', 'icon': Icons.calculate, 'color': Colors.blue},
-  {'name': 'العلوم', 'icon': Icons.science, 'color': Colors.green},
-  {'name': 'اللغة العربية', 'icon': Icons.menu_book, 'color': Colors.orange},
-  {'name': 'اللغة الإنجليزية', 'icon': Icons.translate, 'color': Colors.brown},
-  {'name': 'التاريخ', 'icon': Icons.history, 'color': Colors.purple},
-];
-
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,29 +52,38 @@ class HomeScreen extends StatelessWidget {
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
               ),
-              itemCount: tempSubjects.length,
+              itemCount: subjects.length,
               itemBuilder: (context, index) {
-                final subject = tempSubjects[index];
-                return _buildSubjectCard(context, subject);
+                final subject = subjects[index];
+                final taskCount = dummyTasks
+                    .where((t) => t.subject == subject.name && !t.isCompleted)
+                    .length;
+                return _buildSubjectCard(subject, taskCount);
               },
             ),
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AddSubjectScreen()),
+          );
+          if (result == true) setState(() {});
+        },
+        backgroundColor: primaryColor,
+        child: const Icon(Icons.add),
+      ),
     );
   }
 
-  Widget _buildSubjectCard(BuildContext context, Map<String, dynamic> subject) {
+  Widget _buildSubjectCard(Subject subject, int pendingCount) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                TasksScreen(subjectName: subject['name'] as String),
-          ),
-        );
-      },
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => TasksScreen(subject: subject.name)),
+      ),
       child: Container(
         decoration: BoxDecoration(
           color: cardColor,
@@ -94,24 +102,20 @@ class HomeScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: (subject['color'] as Color).withOpacity(0.1),
+                color: subject.color.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                subject['icon'] as IconData,
-                color: subject['color'],
-                size: 32,
-              ),
+              child: Icon(subject.icon, color: subject.color, size: 32),
             ),
             const SizedBox(height: 12),
             Text(
-              subject['name'] as String,
+              subject.name,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
-            const Text(
-              '0 مهام متبقية',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+            Text(
+              '$pendingCount مهام متبقية',
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
         ),

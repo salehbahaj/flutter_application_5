@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import '../models/task_model.dart';
 import '../utils/constants.dart';
 
 class DetailsScreen extends StatelessWidget {
-  final Map<String, dynamic> task;
+  final Task task;
   const DetailsScreen({Key? key, required this.task}) : super(key: key);
 
   @override
@@ -29,37 +31,40 @@ class DetailsScreen extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        task['title'],
+                        task.title,
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    if (task['isCompleted'])
+                    if (task.isCompleted)
                       const Icon(Icons.check_circle, color: Colors.green),
                   ],
                 ),
                 const Divider(height: 32),
-                _buildDetailRow(Icons.subject, 'المادة', task['subject']),
+                _buildDetailRow(Icons.subject, 'المادة', task.subject),
                 _buildDetailRow(
                   Icons.calendar_today,
                   'تاريخ الاستحقاق',
-                  task['dueDate'],
+                  DateFormat('yyyy-MM-dd').format(task.dueDate),
                 ),
-                _buildDetailRow(Icons.flag, 'الأولوية', task['priority']),
                 _buildDetailRow(
-                  Icons.description,
-                  'الوصف',
-                  task['description'],
+                  Icons.flag,
+                  'الأولوية',
+                  task.priority == Priority.low
+                      ? 'منخفضة'
+                      : task.priority == Priority.medium
+                      ? 'متوسطة'
+                      : 'عالية',
                 ),
+                _buildDetailRow(Icons.description, 'الوصف', task.description),
                 const SizedBox(height: 24),
                 Center(
                   child: Text(
-                    task['isCompleted'] ? '✓ مكتملة' : '○ غير مكتملة',
+                    task.isCompleted ? '✓ مكتملة' : '○ غير مكتملة',
                     style: TextStyle(
-                      fontSize: 16,
-                      color: task['isCompleted'] ? Colors.green : Colors.orange,
+                      color: task.isCompleted ? Colors.green : Colors.orange,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

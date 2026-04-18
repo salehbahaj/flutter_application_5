@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../data/dummy_data.dart';
+import '../models/task_model.dart';
 import '../utils/constants.dart';
 
 class AddTaskScreen extends StatefulWidget {
-  const AddTaskScreen({Key? key}) : super(key: key);
+  final String subject;
+  const AddTaskScreen({Key? key, required this.subject}) : super(key: key);
 
   @override
   State<AddTaskScreen> createState() => _AddTaskScreenState();
@@ -14,15 +17,15 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
-  String _selectedPriority = 'متوسطة';
+  Priority _selectedPriority = Priority.medium;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 72, 201, 130),
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: const Text('إضافة مهمة جديدة'),
-        backgroundColor: const Color.fromARGB(255, 147, 59, 62),
+        backgroundColor: primaryColor,
         centerTitle: true,
       ),
       body: Form(
@@ -57,29 +60,19 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               },
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
+            DropdownButtonFormField<Priority>(
               value: _selectedPriority,
               decoration: const InputDecoration(labelText: 'الأولوية'),
               items: const [
-                DropdownMenuItem(value: 'منخفضة', child: Text('منخفضة')),
-                DropdownMenuItem(value: 'متوسطة', child: Text('متوسطة')),
-                DropdownMenuItem(value: 'عالية', child: Text('عالية')),
+                DropdownMenuItem(value: Priority.low, child: Text('منخفضة')),
+                DropdownMenuItem(value: Priority.medium, child: Text('متوسطة')),
+                DropdownMenuItem(value: Priority.high, child: Text('عالية')),
               ],
               onChanged: (value) => setState(() => _selectedPriority = value!),
             ),
             const SizedBox(height: 32),
             ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  // هنا سيتم حفظ المهمة في التحديث القادم
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('سيتم إضافة المهمة في التحديث القادم'),
-                    ),
-                  );
-                  Navigator.pop(context);
-                }
-              },
+              onPressed: _saveTask,
               style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
               child: const Text(
                 'إضافة المهمة',
@@ -90,5 +83,20 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         ),
       ),
     );
+  }
+
+  void _saveTask() {
+    if (_formKey.currentState!.validate()) {
+      final newTask = Task(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: _titleController.text,
+        description: _descriptionController.text,
+        subject: widget.subject,
+        dueDate: _selectedDate,
+        priority: _selectedPriority,
+      );
+      dummyTasks.add(newTask);
+      Navigator.pop(context, true);
+    }
   }
 }

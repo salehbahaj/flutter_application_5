@@ -1,81 +1,156 @@
 import 'package:flutter/material.dart';
-import '../models/task_model.dart';
-import '../models/subject_model.dart';
+import '../models/item_model.dart';
 
-// قائمة المواد الأولية
+// تغيير من final إلى var لتصبح قابلة للتعديل
 List<Subject> subjects = [
   Subject(
-    id: '1',
+    id: 's1',
     name: 'الرياضيات',
+    color: Colors.blue,
     icon: Icons.calculate,
-    color: Color(0xFF4A6FA5),
   ),
   Subject(
-    id: '2',
-    name: 'العلوم',
+    id: 's2',
+    name: 'الفيزياء',
+    color: Colors.purple,
     icon: Icons.science,
-    color: Color(0xFF2E8B57),
   ),
   Subject(
-    id: '3',
-    name: 'اللغة العربية',
-    icon: Icons.menu_book,
-    color: Color(0xFFD2691E),
+    id: 's3',
+    name: 'البرمجة',
+    color: Colors.green,
+    icon: Icons.code,
   ),
   Subject(
-    id: '4',
+    id: 's4',
+    name: 'الكيمياء',
+    color: Colors.orange,
+    icon: Icons.biotech,
+  ),
+  Subject(
+    id: 's5',
     name: 'اللغة الإنجليزية',
-    icon: Icons.translate,
-    color: Color(0xFF8B4513),
-  ),
-  Subject(
-    id: '5',
-    name: 'التاريخ',
-    icon: Icons.history,
-    color: Color(0xFF6A0DAD),
+    color: Colors.red,
+    icon: Icons.language,
   ),
 ];
 
-// قائمة المهام الأولية
-List<Task> dummyTasks = [
+List<Task> tasks = [
+  // Math tasks
   Task(
-    id: '1',
-    title: 'حل تمرين الرياضيات',
-    description: 'تمارين الصفحة ٤٢',
-    subject: 'الرياضيات',
-    dueDate: DateTime(2026, 4, 5),
-    priority: Priority.high,
+    id: 't1',
+    subjectId: 's1',
+    title: 'حل تمارين الجبر',
+    description: 'حل التمارين من صفحة 45 إلى 50',
+    dueDate: DateTime.now().add(const Duration(days: 2)),
+    isCompleted: false,
+    priority: TaskPriority.high,
   ),
   Task(
-    id: '2',
-    title: 'كتابة بحث العلوم',
-    description: 'بحث عن النظام الشمسي',
-    subject: 'العلوم',
-    dueDate: DateTime(2026, 4, 7),
-    priority: Priority.medium,
+    id: 't2',
+    subjectId: 's1',
+    title: 'مراجعة الهندسة',
+    description: 'مراجعة الفصل الثالث كاملاً',
+    dueDate: DateTime.now().add(const Duration(days: 5)),
+    isCompleted: true,
+    priority: TaskPriority.medium,
   ),
   Task(
-    id: '3',
-    title: 'مراجعة اللغة العربية',
-    description: 'قواعد النحو',
-    subject: 'اللغة العربية',
-    dueDate: DateTime(2026, 4, 4),
-    priority: Priority.low,
+    id: 't3',
+    subjectId: 's1',
+    title: 'الاختبار الشهري',
+    description: 'الاستعداد للاختبار الشهري',
+    dueDate: DateTime.now().add(const Duration(days: 7)),
+    isCompleted: false,
+    priority: TaskPriority.high,
+  ),
+
+  // Physics tasks
+  Task(
+    id: 't4',
+    subjectId: 's2',
+    title: 'تقرير التجربة',
+    description: 'كتابة تقرير عن تجربة الحركة',
+    dueDate: DateTime.now().add(const Duration(days: 3)),
+    isCompleted: false,
+    priority: TaskPriority.high,
   ),
   Task(
-    id: '4',
-    title: 'حل واجب الإنجليزي',
-    description: 'تمارين الوحدة الثالثة',
-    subject: 'اللغة الإنجليزية',
-    dueDate: DateTime(2026, 4, 6),
-    priority: Priority.medium,
+    id: 't5',
+    subjectId: 's2',
+    title: 'حل أسئلة الكتاب',
+    description: 'حل أسئلة الفصل الرابع',
+    dueDate: DateTime.now().add(const Duration(days: 4)),
+    isCompleted: false,
+    priority: TaskPriority.low,
+  ),
+
+  // Programming tasks
+  Task(
+    id: 't6',
+    subjectId: 's3',
+    title: 'مشروع Flutter',
+    description: 'إكمال تطبيق إدارة المهام',
+    dueDate: DateTime.now().add(const Duration(days: 10)),
+    isCompleted: false,
+    priority: TaskPriority.high,
   ),
   Task(
-    id: '5',
-    title: 'مشروع التاريخ',
-    description: 'الحضارة الإسلامية',
-    subject: 'التاريخ',
-    dueDate: DateTime(2026, 4, 10),
-    priority: Priority.high,
+    id: 't7',
+    subjectId: 's3',
+    title: 'دراسة Dart',
+    description: 'مراجعة أساسيات لغة Dart',
+    dueDate: DateTime.now().add(const Duration(days: 1)),
+    isCompleted: true,
+    priority: TaskPriority.medium,
+  ),
+  Task(
+    id: 't8',
+    subjectId: 's3',
+    title: 'واجب الخوارزميات',
+    description: 'حل مسائل الخوارزميات',
+    dueDate: DateTime.now().add(const Duration(days: 6)),
+    isCompleted: false,
+    priority: TaskPriority.medium,
+  ),
+
+  // Chemistry tasks
+  Task(
+    id: 't9',
+    subjectId: 's4',
+    title: 'حفظ الجدول الدوري',
+    description: 'حفظ العناصر من 1 إلى 20',
+    dueDate: DateTime.now().add(const Duration(days: 3)),
+    isCompleted: true,
+    priority: TaskPriority.low,
+  ),
+  Task(
+    id: 't10',
+    subjectId: 's4',
+    title: 'تجربة معملية',
+    description: 'إجراء تجربة التفاعلات الكيميائية',
+    dueDate: DateTime.now().add(const Duration(days: 8)),
+    isCompleted: false,
+    priority: TaskPriority.medium,
+  ),
+
+  // English tasks
+  Task(
+    id: 't11',
+    subjectId: 's5',
+    title: 'كتابة مقال',
+    description: 'كتابة مقال عن التكنولوجيا',
+    dueDate: DateTime.now().add(const Duration(days: 4)),
+    isCompleted: false,
+    priority: TaskPriority.high,
+  ),
+  Task(
+    id: 't12',
+    subjectId: 's5',
+    title: 'حفظ المفردات',
+    description: 'حفظ 50 كلمة جديدة',
+    dueDate: DateTime.now().add(const Duration(days: 2)),
+    isCompleted: true,
+    priority: TaskPriority.low,
   ),
 ];

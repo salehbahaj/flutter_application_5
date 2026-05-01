@@ -1,102 +1,107 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import '../models/item_model.dart';
 import '../data/dummy_data.dart';
-import '../models/task_model.dart';
-import '../utils/constants.dart';
 
 class AddTaskScreen extends StatefulWidget {
-  final String subject;
-  const AddTaskScreen({Key? key, required this.subject}) : super(key: key);
+  final Subject subject;
+
+  const AddTaskScreen({super.key, required this.subject});
 
   @override
   State<AddTaskScreen> createState() => _AddTaskScreenState();
 }
 
 class _AddTaskScreenState extends State<AddTaskScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  DateTime _selectedDate = DateTime.now();
-  Priority _selectedPriority = Priority.medium;
+  final titleController = TextEditingController();
+  final descController = TextEditingController();
+  DateTime selectedDate = DateTime.now();
+  TaskPriority priority = TaskPriority.medium;
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+      locale: const Locale('ar', 'SA'),
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
+  }
+
+  void saveTask() {
+    if (titleController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('الرجاء إدخال عنوان المهمة')),
+      );
+      return;
+    }
+    tasks.add(Task(
+      id: DateTime.now().toString(),
+      subjectId: widget.subject.id,
+      title: titleController.text,
+      description: descController.text,
+      dueDate: selectedDate,
+      priority: priority,
+    ));
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: const Text('إضافة مهمة جديدة'),
-        backgroundColor: primaryColor,
-        centerTitle: true,
+        title: const Text('إضافة مهمة'),
+        backgroundColor: widget.subject.color,
       ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            TextFormField(
-              controller: _titleController,
-              decoration: const InputDecoration(labelText: 'عنوان المهمة'),
-              validator: (v) => v!.isEmpty ? 'الرجاء إدخال عنوان' : null,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(labelText: 'الوصف'),
-              maxLines: 3,
-            ),
-            const SizedBox(height: 16),
-            ListTile(
-              title: const Text('تاريخ الاستحقاق'),
-              subtitle: Text(DateFormat('yyyy-MM-dd').format(_selectedDate)),
-              trailing: const Icon(Icons.calendar_today),
-              onTap: () async {
-                final picked = await showDatePicker(
-                  context: context,
-                  initialDate: _selectedDate,
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime(2030),
-                );
-                if (picked != null) setState(() => _selectedDate = picked);
-              },
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<Priority>(
-              value: _selectedPriority,
-              decoration: const InputDecoration(labelText: 'الأولوية'),
-              items: const [
-                DropdownMenuItem(value: Priority.low, child: Text('منخفضة')),
-                DropdownMenuItem(value: Priority.medium, child: Text('متوسطة')),
-                DropdownMenuItem(value: Priority.high, child: Text('عالية')),
-              ],
-              onChanged: (value) => setState(() => _selectedPriority = value!),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: _saveTask,
-              style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
-              child: const Text(
-                'إضافة المهمة',
-                style: TextStyle(color: Colors.white),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(labelText: 'العنوان'),
               ),
-            ),
-          ],
+              TextField(
+                controller: descController,
+                decoration: const InputDecoration(labelText: 'الوصف'),
+              ),
+              ListTile(
+                title: const Text('تاريخ الاستحقاق'),
+                subtitle: Text(
+                    '${selectedDate.year}/${selectedDate.month}/${selectedDate.day}'),
+                trailing: const Icon(Icons.calendar_today),
+                onTap: () => _selectDate(context),
+              ),
+              DropdownButton<TaskPriority>(
+                value: priority,
+                isExpanded: true,
+                items: TaskPriority.values.map((p) {
+                  return DropdownMenuItem(
+                    value: p,
+                    child: Text(p.name),
+                  );
+                }).toList(),
+                onChanged: (val) {
+                  setState(() => priority = val!);
+                },
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: saveTask,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: widget.subject.color,
+                ),
+                child: const Text('حفظ'),
+              )
+            ],
+          ),
         ),
       ),
     );
-  }
-
-  void _saveTask() {
-    if (_formKey.currentState!.validate()) {
-      final newTask = Task(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        title: _titleController.text,
-        description: _descriptionController.text,
-        subject: widget.subject,
-        dueDate: _selectedDate,
-        priority: _selectedPriority,
-      );
-      dummyTasks.add(newTask);
-      Navigator.pop(context, true);
-    }
   }
 }
